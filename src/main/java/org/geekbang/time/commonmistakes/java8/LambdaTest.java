@@ -54,6 +54,7 @@ public class LambdaTest {
 
         Function<String, String> upperCase = String::toUpperCase;
         Function<String, String> duplicate = s -> s.concat(s);
+        System.out.println(duplicate.apply("haha"));
         assertThat(upperCase.andThen(duplicate).apply("test"), is("TESTTEST"));
 
         /**

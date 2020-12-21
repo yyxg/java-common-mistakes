@@ -9,6 +9,7 @@ import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -16,6 +17,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 import java.util.regex.Pattern;
+import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 import static org.hamcrest.CoreMatchers.is;
@@ -104,8 +106,18 @@ public class CoolStreamTest {
         assertTrue(cache.containsKey(1L));
     }
 
+
+    /**
+     * 使用lambda表达式
+     * @param id
+     * @return
+     */
     private Product getProductAndCacheCool(Long id) {
         //当Key不存在的时候提供一个Function来代表根据Key获取Value的过程
+
+        //computeIfAbsent 第一个参数是key 第二个参数是Function
+        // 这个Function 函数 是输入一个数据，计算后输出一个数据。
+        // i 是形参 函数定义,实参是 apply 函数的实参即 key
         return cache.computeIfAbsent(id, i ->
                 Product.getData().stream()
                         .filter(p -> p.getId().equals(i)) //过滤
@@ -113,6 +125,11 @@ public class CoolStreamTest {
                         .orElse(null)); //如果找不Product到则使用null
     }
 
+    /**
+     * Java 8 之前代码
+     * @param id
+     * @return
+     */
     private Product getProductAndCache(Long id) {
         Product product = null;
         if (cache.containsKey(id)) {
@@ -134,13 +151,19 @@ public class CoolStreamTest {
     public void filesExample() throws IOException {
         //无限深度，递归遍历文件夹
         try (Stream<Path> pathStream = Files.walk(Paths.get("."))) {
-            pathStream.filter(Files::isRegularFile) //只查普通文件
-                    .filter(FileSystems.getDefault().getPathMatcher("glob:**/*.java")::matches) //搜索java源码文件
+            //只查普通文件
+            pathStream.filter(Files::isRegularFile)
+                    //搜索java源码文件
+                    .filter(FileSystems.getDefault().getPathMatcher("glob:**/*.java")::matches)
                     .flatMap(ThrowingFunction.unchecked(path ->
-                            Files.readAllLines(path).stream() //读取文件内容，转换为Stream<List>
-                                    .filter(line -> Pattern.compile("public class").matcher(line).find()) //使用正则过滤带有public class的行
-                                    .map(line -> path.getFileName() + " >> " + line))) //把这行文件内容转换为文件名+行
-                    .forEach(System.out::println); //打印所有的行
+                            //读取文件内容，转换为Stream<List>
+                            Files.readAllLines(path).stream()
+                                    //使用正则过滤带有public class的行
+                                    .filter(line -> Pattern.compile("public class").matcher(line).find())
+                                    //把这行文件内容转换为文件名+行
+                                    .map(line -> path.getFileName() + " >> " + line)))
+                    //打印所有的行
+                    .forEach(System.out::println);
         }
     }
 
@@ -153,6 +176,15 @@ public class CoolStreamTest {
     }
 
 
+    /**
+     *
+     * 因为 Files.readAllLines 方法会抛出一个受检异常（IOException
+     * 所以我使用了一个自定义的函数式接口，
+     * 用 ThrowingFunction 包装这个方法，把受检异常转换为运行时异常
+     * @param <T>
+     * @param <R>
+     * @param <E>
+     */
     @FunctionalInterface
     public interface ThrowingFunction<T, R, E extends Throwable> {
         static <T, R, E extends Throwable> Function<T, R> unchecked(ThrowingFunction<T, R, E> f) {
@@ -167,4 +199,6 @@ public class CoolStreamTest {
 
         R apply(T t) throws E;
     }
+
+
 }
