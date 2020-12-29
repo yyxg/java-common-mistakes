@@ -152,7 +152,7 @@ public class ParallelTest {
 
     /**
      * 第四种方式
-     * 直接使用并行流，并行流使 parallel
+     * 直接使用并行流，并行流使
      * 公共的 ForkJoinPool 默认的并行度是 CPU 核心数 -1，
      * 原因是对于 CPU 绑定的任务分配超过 CPU 个数的线程没有意义。
      * 由于并行流还会使用主线程执行任务，也会占用一个 CPU 核心，

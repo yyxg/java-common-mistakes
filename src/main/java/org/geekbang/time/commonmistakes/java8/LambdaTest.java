@@ -2,6 +2,8 @@ package org.geekbang.time.commonmistakes.java8;
 
 import org.junit.Test;
 
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.*;
 
@@ -71,5 +73,6 @@ public class LambdaTest {
         BinaryOperator<Integer> add = Integer::sum;
         BinaryOperator<Integer> subtraction = (a, b) -> a - b;
         assertThat(subtraction.apply(add.apply(1, 2), 3), is(0));
+        Collections.synchronizedSet(new HashSet());
     }
 }

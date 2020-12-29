@@ -19,6 +19,9 @@ import static java.util.stream.Collectors.*;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 
+/**
+ * @author xialihui
+ */
 public class StreamDetailTest {
     private static Random random = new Random();
     private List<Order> orders;
@@ -35,6 +38,7 @@ public class StreamDetailTest {
     public void filter() {
         System.out.println("//最近半年的金额大于40的订单");
         orders.stream()
+                //过滤null 值
                 .filter(Objects::nonNull)
                 .filter(order -> order.getPlacedAt().isAfter(LocalDateTime.now().minusMonths(6)))
                 .filter(order -> order.getTotalPrice() > 40)
@@ -46,15 +50,19 @@ public class StreamDetailTest {
         //计算所有订单商品数量
         //通过两次遍历实现
         LongAdder longAdder = new LongAdder();
+        // 先遍历所有的order 然后从order取出 orderItemList 再去遍历order里面的元素
         orders.stream().forEach(order ->
                 order.getOrderItemList().forEach(orderItem -> longAdder.add(orderItem.getProductQuantity())));
 
         //使用两次mapToLong+sum方法实现
+        // LongStream 转成LongStream
+        // 校验两次校验结果是否相同
         assertThat(longAdder.longValue(), is(orders.stream().mapToLong(order ->
                 order.getOrderItemList().stream()
                         .mapToLong(OrderItem::getProductQuantity).sum()).sum()));
 
         //把IntStream通过转换Stream<Project>
+        //替代 for 循环来生成数据，比如生成 10 个 Product 元素构成 List
         System.out.println(IntStream.rangeClosed(1, 10)
                 .mapToObj(i -> new Product((long) i, "product" + i, i * 100.0))
                 .collect(toList()));
@@ -71,7 +79,7 @@ public class StreamDetailTest {
 
     @Test
     public void flatMap() {
-        //不依赖订单上的总价格字段
+        //依赖订单上的总价格字段
         System.out.println(orders.stream().mapToDouble(order -> order.getTotalPrice()).sum());
 
         //如果不依赖订单上的总价格,可以直接展开订单商品进行价格统计

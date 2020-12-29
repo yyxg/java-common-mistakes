@@ -73,6 +73,10 @@ public class CoolStreamTest {
     @Test
     public void stream() {
         List<Integer> ints = Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8);
+
+        System.out.println(ints.stream().filter(i->i==2).findFirst().isPresent());
+
+
         double average = calc(ints);
         double streamResult =
                 ints.stream()
