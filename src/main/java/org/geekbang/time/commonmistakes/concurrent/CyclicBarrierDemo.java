@@ -1,4 +1,4 @@
-package org.geekbang.time.commonmistakes.cyclicbarrier;
+package org.geekbang.time.commonmistakes.concurrent;
 
 import java.util.ArrayList;
 import java.util.Collections;

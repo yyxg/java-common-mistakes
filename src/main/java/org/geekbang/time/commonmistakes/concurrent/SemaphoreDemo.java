@@ -1,4 +1,4 @@
-package org.geekbang.time.commonmistakes.cyclicbarrier;
+package org.geekbang.time.commonmistakes.concurrent;
 
 import java.util.concurrent.Semaphore;
 
@@ -11,7 +11,7 @@ public class SemaphoreDemo {
     public static void main(String[] args) throws InterruptedException {
         System.out.println("Action...GO!");
         Semaphore semaphore = new Semaphore(5);
-        for (int i = 0; i < 10; i++) {
+        for (int i = 0; i < 100; i++) {
             Thread t = new Thread(new SemaphoreWorker(semaphore));
             t.start();
         }
